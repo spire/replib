@@ -1,0 +1,14 @@
+.DS_Store
+*~
+.#*
+\#*
+*.hi
+*.o
+*.flymake
+*.pdf
+*.aux
+*.log
+*.bbl
+*.blg
+tmp
+
