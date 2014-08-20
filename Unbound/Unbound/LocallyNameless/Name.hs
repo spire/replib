@@ -122,7 +122,7 @@ instance Rep a => Read (Name a) where
   readPrec = do
     x <- R.lexP
     case x of
-      R.Ident ('_' : int) -> return $ Nm rep (""  , read int)
+      R.Ident ('_':i:nt) -> return $ Nm rep (""  , read (i:nt))
       R.Ident strInt -> case break isDigit strInt of
        (str , "") -> return $ Nm rep (str, 0)
        (str , int) -> return $ Nm rep (str, read int)
@@ -131,7 +131,7 @@ instance Rep a => Read (Name a) where
         R.Number int2 <- R.lexP
         return $ Bn rep
           (maybe undefined id (numberToInteger int1))
-          (maybe undefined id (numberToInteger int1))
+          (maybe undefined id (numberToInteger int2))
       _ -> error $ "Cannot read Name: " ++ show x
 
   readListPrec = R.readListPrecDefault
