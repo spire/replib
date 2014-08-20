@@ -127,7 +127,6 @@ instance Rep a => Read (Name a) where
        (str , "") -> return $ Nm rep (str, 0)
        (str , int) -> return $ Nm rep (str, read int)
       R.Number int1 -> do
-        error $ show int1
         R.Punc "@" <- R.lexP
         R.Number int2 <- R.lexP
         return $ Bn rep
