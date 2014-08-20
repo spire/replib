@@ -186,7 +186,7 @@ module Unbound.LocallyNameless
     -- ** Substitution
 
     -- | Capture-avoiding substitution.
-    Subst(..), SubstName(..),
+    Subst(..), SubstName(..), SubstM(..),
 
     -- ** Permutations
 
@@ -264,6 +264,7 @@ import Unbound.LocallyNameless.Fresh
 import Unbound.LocallyNameless.Types
 import Unbound.LocallyNameless.Alpha
 import Unbound.LocallyNameless.Subst
+import Unbound.LocallyNameless.SubstM
 import Unbound.LocallyNameless.Ops
 import Unbound.Util
 import Unbound.PermM

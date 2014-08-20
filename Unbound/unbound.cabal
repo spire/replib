@@ -1,5 +1,5 @@
 name:           unbound
-version:        0.4.3.1
+version:        0.4.3.2
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -42,6 +42,7 @@ Library
     Unbound.LocallyNameless.Types,
     Unbound.LocallyNameless.Alpha,
     Unbound.LocallyNameless.Subst,
+    Unbound.LocallyNameless.SubstM,
     Unbound.LocallyNameless.Ops,
     Unbound.PermM,
     Unbound.Util
