@@ -48,6 +48,9 @@ module Unbound.LocallyNameless.Name
        ) where
 
 import Generics.RepLib
+import qualified Text.Read as R
+import Text.Read.Lex (numberToInteger)
+import Data.Char (isDigit)
 
 $(derive_abstract [''R])
 -- The above only works with GHC 7.
@@ -115,8 +118,24 @@ instance Ord AnyName where
 -- Utilities
 ------------------------------------------------------------
 
---instance Read Name where
---  read s = error "FIXME"
+instance Rep a => Read (Name a) where
+  readPrec = do
+    x <- R.lexP
+    case x of
+      R.Ident ('_' : int) -> return $ Nm rep (""  , read int)
+      R.Ident strInt -> case break isDigit strInt of
+       (str , "") -> return $ Nm rep (str, 0)
+       (str , int) -> return $ Nm rep (str, read int)
+      R.Number int1 -> do
+        error $ show int1
+        R.Punc "@" <- R.lexP
+        R.Number int2 <- R.lexP
+        return $ Bn rep
+          (maybe undefined id (numberToInteger int1))
+          (maybe undefined id (numberToInteger int1))
+      _ -> error $ "Cannot read Name: " ++ show x
+
+  readListPrec = R.readListPrecDefault
 
 instance Show (Name a) where
   show (Nm _ ("",n)) = "_" ++ (show n)

@@ -53,9 +53,9 @@ unsafeUnbind (B a b) = (a, openT a b)
 
 instance (Alpha a, Alpha b, Read a, Read b) => Read (Bind a b) where
          readPrec = R.parens $ (R.prec app_prec $ do
-                                  R.Ident "<" <- R.lexP
+                                  R.Symbol "<" <- R.lexP
                                   m1 <- R.step R.readPrec
-                                  R.Ident ">" <- R.lexP
+                                  R.Symbol ">" <- R.lexP
                                   m2 <- R.step R.readPrec
                                   return (bind m1 m2))
            where app_prec = 10
@@ -148,6 +148,17 @@ rebind p1 p2 = R p1 (closeP p1 p2)
 instance (Alpha p1, Alpha p2, Eq p2) => Eq (Rebind p1 p2) where
    b1 == b2 = b1 `aeqBinders` b2
 
+instance (Alpha a, Alpha b, Read a, Read b) => Read (Rebind a b) where
+         readPrec = R.parens $ (R.prec app_prec $ do
+                                  R.Symbol "<<" <- R.lexP
+                                  m1 <- R.step R.readPrec
+                                  R.Symbol ">>" <- R.lexP
+                                  m2 <- R.step R.readPrec
+                                  return (rebind m1 m2))
+           where app_prec = 10
+
+         readListPrec = R.readListPrecDefault
+
 -- | Destructor for rebinding patterns.  It does not need a monadic
 --   context for generating fresh names, since @Rebind@ can only occur
 --   in the pattern of a 'Bind'; hence a previous call to 'unbind' (or
@@ -164,6 +175,16 @@ unrebind (R p1 p2) = (p1, openP p1 p2)
 rec :: (Alpha p) => p -> Rec p
 rec p = Rec (closeP p p) where
 
+instance (Alpha a, Read a) => Read (Rec a) where
+         readPrec = R.parens $ (R.prec app_prec $ do
+                                  R.Punc "[" <- R.lexP
+                                  m <- R.step R.readPrec
+                                  R.Punc "]" <- R.lexP
+                                  return (rec m))
+           where app_prec = 10
+
+         readListPrec = R.readListPrecDefault
+
 -- | Destructor for recursive patterns.
 unrec :: (Alpha p) => Rec p -> p
 unrec (Rec p) = openP p p
@@ -175,6 +196,16 @@ unrec (Rec p) = openP p p
 -- | Constructor for recursive abstractions.
 trec :: Alpha p => p -> TRec p
 trec p = TRec $ bind (rec p) ()
+
+instance (Alpha a, Read a) => Read (TRec a) where
+         readPrec = R.parens $ (R.prec app_prec $ do
+                                  R.Punc "[" <- R.lexP
+                                  m <- R.step R.readPrec
+                                  R.Punc "]" <- R.lexP
+                                  return (trec m))
+           where app_prec = 10
+
+         readListPrec = R.readListPrecDefault
 
 -- | Destructor for recursive abstractions which picks globally fresh
 --   names for the binders.

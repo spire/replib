@@ -41,6 +41,7 @@ import Unbound.LocallyNameless.Name
 
 import Data.Binary
 import Control.Applicative (pure, (<$>), (<*>))
+import qualified Text.Read as R
 
 ------------------------------------------------------------
 -- Basic types
@@ -135,6 +136,16 @@ newtype Embed t = Embed t deriving Eq
 instance Show a => Show (Embed a) where
   showsPrec _ (Embed a) = showString "{" . showsPrec 0 a . showString "}"
 
+instance Read a => Read (Embed a) where
+         readPrec = R.parens $ (R.prec app_prec $ do
+                                  R.Punc "{" <- R.lexP
+                                  m <- R.step R.readPrec
+                                  R.Punc "}" <- R.lexP
+                                  return (Embed m))
+           where app_prec = 10
+
+         readListPrec = R.readListPrecDefault
+
 -- Shift
 --------------------------------------------------
 
@@ -143,6 +154,16 @@ newtype Shift p = Shift p deriving Eq
 
 instance Show a => Show (Shift a) where
   showsPrec _ (Shift a) = showString "{" . showsPrec 0 a . showString "}"
+
+instance Read a => Read (Shift a) where
+         readPrec = R.parens $ (R.prec app_prec $ do
+                                  R.Punc "{" <- R.lexP
+                                  m <- R.step R.readPrec
+                                  R.Punc "}" <- R.lexP
+                                  return (Shift m))
+           where app_prec = 10
+
+         readListPrec = R.readListPrecDefault
 
 -- Pay no attention...
 
