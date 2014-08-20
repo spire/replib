@@ -52,12 +52,12 @@ unsafeUnbind :: (Alpha a, Alpha b) => GenBind order card a b -> (a,b)
 unsafeUnbind (B a b) = (a, openT a b)
 
 instance (Alpha a, Alpha b, Read a, Read b) => Read (Bind a b) where
-         readPrec = R.parens $ (R.prec app_prec $ do
+         readPrec = R.parens $ R.prec app_prec $ do
                                   R.Symbol "<" <- R.lexP
                                   m1 <- R.step R.readPrec
                                   R.Symbol ">" <- R.lexP
                                   m2 <- R.step R.readPrec
-                                  return (bind m1 m2))
+                                  return (bind m1 m2)
            where app_prec = 10
 
          readListPrec = R.readListPrecDefault
@@ -149,12 +149,12 @@ instance (Alpha p1, Alpha p2, Eq p2) => Eq (Rebind p1 p2) where
    b1 == b2 = b1 `aeqBinders` b2
 
 instance (Alpha a, Alpha b, Read a, Read b) => Read (Rebind a b) where
-         readPrec = R.parens $ (R.prec app_prec $ do
+         readPrec = R.parens $ R.prec app_prec $ do
                                   R.Symbol "<<" <- R.lexP
                                   m1 <- R.step R.readPrec
                                   R.Symbol ">>" <- R.lexP
                                   m2 <- R.step R.readPrec
-                                  return (rebind m1 m2))
+                                  return (rebind m1 m2)
            where app_prec = 10
 
          readListPrec = R.readListPrecDefault
@@ -176,11 +176,11 @@ rec :: (Alpha p) => p -> Rec p
 rec p = Rec (closeP p p) where
 
 instance (Alpha a, Read a) => Read (Rec a) where
-         readPrec = R.parens $ (R.prec app_prec $ do
+         readPrec = R.prec app_prec $ do
                                   R.Punc "[" <- R.lexP
                                   m <- R.step R.readPrec
                                   R.Punc "]" <- R.lexP
-                                  return (rec m))
+                                  return (rec m)
            where app_prec = 10
 
          readListPrec = R.readListPrecDefault
@@ -198,11 +198,11 @@ trec :: Alpha p => p -> TRec p
 trec p = TRec $ bind (rec p) ()
 
 instance (Alpha a, Read a) => Read (TRec a) where
-         readPrec = R.parens $ (R.prec app_prec $ do
+         readPrec = R.prec app_prec $ do
                                   R.Punc "[" <- R.lexP
                                   m <- R.step R.readPrec
                                   R.Punc "]" <- R.lexP
-                                  return (trec m))
+                                  return (trec m)
            where app_prec = 10
 
          readListPrec = R.readListPrecDefault
