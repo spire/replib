@@ -51,7 +51,7 @@ import Control.Monad.Identity
 import Control.Applicative (Applicative)
 
 import Control.Monad.Trans.Cont
-import Control.Monad.Trans.Error
+import Control.Monad.Trans.Except
 import Control.Monad.Trans.Identity
 import Control.Monad.Trans.List
 import Control.Monad.Trans.Maybe
@@ -118,7 +118,7 @@ contFreshM m = runIdentity . contFreshMT m
 instance Fresh m => Fresh (ContT r m) where
   fresh = lift . fresh
 
-instance (Error e, Fresh m) => Fresh (ErrorT e m) where
+instance Fresh m => Fresh (ExceptT e m) where
   fresh = lift . fresh
 
 instance Fresh m => Fresh (IdentityT m) where
@@ -226,9 +226,9 @@ instance LFresh m => LFresh (ContT r m) where
   avoid  = mapContT . avoid
   getAvoids = lift getAvoids
 
-instance (Error e, LFresh m) => LFresh (ErrorT e m) where
+instance LFresh m => LFresh (ExceptT e m) where
   lfresh = lift . lfresh
-  avoid  = mapErrorT . avoid
+  avoid  = mapExceptT . avoid
   getAvoids = lift getAvoids
 
 instance LFresh m => LFresh (IdentityT m) where
